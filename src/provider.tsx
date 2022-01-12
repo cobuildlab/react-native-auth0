@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import * as React from 'react';
 import jwt_decode from 'jwt-decode';
 import { UserInfo, Credentials } from 'react-native-auth0';
@@ -60,7 +59,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
 
 
   const login = React.useCallback(async () => {
-    console.log('calling lodgin');
     // to have more control when dispatching avoid using the createAction here
     setLoading(true);
     let authorizeResponse: Credentials;
@@ -80,7 +78,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
 
     const email = authorizeUserInfo?.email;
     try {
-      // This hook should not depend on any action, but for the little time I have I leave it like this
       await fetchUser(eichBaseEndpoint, eichBaseToken);
     } catch (error) {
       console.log('eichbase error', JSON.stringify(error));
@@ -103,7 +100,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
 
 
   const logout = React.useCallback(async () => {
-    console.log('logout');
     try {
       await auth0.webAuth.clearSession();
     } catch (error) {
@@ -114,16 +110,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   }, [auth0, removeToken]);
 
 
-  const AuthenticateCheck = async (): Promise<void> => {
-    console.log('start auth --- getting store token', auth0);
+  const authenticateCheck = async (): Promise<void> => {
     const storedCredentials = await onGetStoreToken();
 
     if (!storedCredentials) {
       setLoading(false);
       return;
     }
-
-    console.log('requesting auth token');
 
     let request;
     try {
@@ -142,8 +135,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   };
 
   React.useEffect(() => {
-    console.log('use effect');
-    AuthenticateCheck();
+    authenticateCheck();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
