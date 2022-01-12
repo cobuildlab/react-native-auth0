@@ -53,6 +53,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
       console.error('Error delete store token', JSON.stringify(error));
       throw new Error('Error delete store token');
     }
+    setUserInfo(undefined);
+    setCredentials(undefined);
     setAuthenticated(false);
     setLoading(false);
   }, [removeCredentials]);
