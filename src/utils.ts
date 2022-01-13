@@ -13,7 +13,6 @@ export const fetchUser = async (endpoint: string, token: string): Promise<User |
   });
 
   const response = await request.json();
-  console.log('response get user', JSON.stringify(response));
 
   if(response?.errors){
     throw new Error(JSON.stringify(response?.errors));
@@ -32,8 +31,6 @@ type createUserParams = {
 export const createUser = async (params: createUserParams): Promise<User> => {
   const { endpoint, token, email, authProfileId } = params;
 
-  console.log('params', params);
-
   const request = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -46,7 +43,6 @@ export const createUser = async (params: createUserParams): Promise<User> => {
   });
 
   const response = await request.json();
-  console.log('response mutation create user', JSON.stringify(response));
 
   if(response?.errors){
     throw new Error(JSON.stringify(response?.errors));

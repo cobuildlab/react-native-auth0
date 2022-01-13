@@ -17,7 +17,6 @@ export type UseAuthType = {
 export type AuthProviderConfig = {
   auth0: Auth0;
   eichBaseEndpoint: string;
-  eichBaseToken: string;
   eichBaseAuthProfileId: string;
   getCredentials: () => Promise< Credentials | null>;
   removeCredentials: () => Promise<void>;

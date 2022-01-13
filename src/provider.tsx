@@ -8,7 +8,7 @@ import { AuthProviderProps } from './types';
 
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) => {
-  const { auth0, eichBaseEndpoint, eichBaseToken, eichBaseAuthProfileId, saveCredentials, getCredentials, removeCredentials  } = config;
+  const { auth0, eichBaseEndpoint, eichBaseAuthProfileId, saveCredentials, getCredentials, removeCredentials  } = config;
   const [credentials, setCredentials] = React.useState<Credentials>();
   const [userInfo, setUserInfo] = React.useState<UserInfo>();
   const [isAuthenticated, setAuthenticated] = React.useState(false);
@@ -103,6 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
 
 
   const logout = React.useCallback(async () => {
+    setLoading(true);
     try {
       await auth0.webAuth.clearSession();
     } catch (error) {
