@@ -77,16 +77,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     }
 
     const authorizeUserInfo = jwt_decode(authorizeResponse.idToken) as UserInfo;
+    const token =  authorizeResponse.idToken;
 
     const email = authorizeUserInfo?.email;
     try {
-      await fetchUser(eichBaseEndpoint, eichBaseToken);
+      await fetchUser(eichBaseEndpoint, token);
     } catch (error) {
       console.log('eichbase error', JSON.stringify(error));
       await createUser({ 
-        endpoint: eichBaseEndpoint, 
-        token: eichBaseToken, 
+        token, 
         email, 
+        endpoint: eichBaseEndpoint, 
         authProfileId: eichBaseAuthProfileId 
       });
     }
@@ -97,7 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     setUserInfo(authorizeUserInfo);
     setAuthenticated(true);
     setLoading(false);
-  }, [eichBaseEndpoint, eichBaseToken, auth0, eichBaseAuthProfileId, onSaveToken]);
+  }, [eichBaseEndpoint, auth0, eichBaseAuthProfileId, onSaveToken]);
 
 
 
@@ -126,8 +127,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
         token: storedCredentials.accessToken,
       });
     } catch (error) {
-      console.error('Authenticate error', JSON.stringify(error));
+      console.warn('Authenticate error', JSON.stringify(error));
       removeToken();
+      return;
     }
 
     setCredentials(storedCredentials);
