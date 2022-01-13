@@ -1,6 +1,6 @@
 export const USER_QUERY = `
-  mutation UserSignUp($user: UserCreateInput!, $authProfileId: ID) {
-    userSignUpWithToken(user: $user, authProfileId: $authProfileId) {
+  query {
+    user{
       id
       email
     }
@@ -8,8 +8,8 @@ export const USER_QUERY = `
 `;
 
 export const CREATE_USER_QUERY = (email: string, authProfileId: string): string => (`
-  mutation UserSignUp{
-    userSignUpWithToken(user: { email: ${email} }, authProfileId: ${authProfileId}) {
+  mutation{
+    userSignUpWithToken(user: { email: "${email}" }, authProfileId: "${authProfileId}") {
       id
       email
     }

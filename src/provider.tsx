@@ -8,7 +8,7 @@ import { AuthProviderProps } from './types';
 
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) => {
-  const { auth0, eichBaseEndpoint, eichBaseToken, eichBaseAuthProfileId, saveCredentials, getCredentials, removeCredentials  } = config;
+  const { auth0, eichBaseEndpoint, eichBaseAuthProfileId, saveCredentials, getCredentials, removeCredentials  } = config;
   const [credentials, setCredentials] = React.useState<Credentials>();
   const [userInfo, setUserInfo] = React.useState<UserInfo>();
   const [isAuthenticated, setAuthenticated] = React.useState(false);
@@ -77,16 +77,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     }
 
     const authorizeUserInfo = jwt_decode(authorizeResponse.idToken) as UserInfo;
+    const token =  authorizeResponse.idToken;
 
     const email = authorizeUserInfo?.email;
     try {
-      await fetchUser(eichBaseEndpoint, eichBaseToken);
+      await fetchUser(eichBaseEndpoint, token);
     } catch (error) {
       console.log('eichbase error', JSON.stringify(error));
       await createUser({ 
-        endpoint: eichBaseEndpoint, 
-        token: eichBaseToken, 
+        token, 
         email, 
+        endpoint: eichBaseEndpoint, 
         authProfileId: eichBaseAuthProfileId 
       });
     }
@@ -97,11 +98,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     setUserInfo(authorizeUserInfo);
     setAuthenticated(true);
     setLoading(false);
-  }, [eichBaseEndpoint, eichBaseToken, auth0, eichBaseAuthProfileId, onSaveToken]);
+  }, [eichBaseEndpoint, auth0, eichBaseAuthProfileId, onSaveToken]);
 
 
 
   const logout = React.useCallback(async () => {
+    setLoading(true);
     try {
       await auth0.webAuth.clearSession();
     } catch (error) {
@@ -126,8 +128,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
         token: storedCredentials.accessToken,
       });
     } catch (error) {
-      console.error('Authenticate error', JSON.stringify(error));
+      console.warn('Authenticate error', JSON.stringify(error));
       removeToken();
+      return;
     }
 
     setCredentials(storedCredentials);
