@@ -7,6 +7,7 @@ export const AuthContext = React.createContext<UseAuthType>({
   isLoading: false,
   login: () => {},
   logout: () => {},
+  auth: async () => null,
 });
 
 

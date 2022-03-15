@@ -1,14 +1,17 @@
 import * as React from 'react';
 import jwt_decode from 'jwt-decode';
 import { UserInfo, Credentials } from 'react-native-auth0';
-
 import { AuthContext } from './context';
-import { fetchUser, createUser } from './utils';
 import { AuthProviderProps } from './types';
 
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) => {
-  const { auth0, eichBaseEndpoint, eichBaseAuthProfileId, saveCredentials, getCredentials, removeCredentials  } = config;
+export const AuthProvider: React.FC<AuthProviderProps> = ({ 
+  children, 
+  auth0, 
+  onSaveCredentials, 
+  onGetCredentials, 
+  onRemoveCredentials 
+}) => {
   const [credentials, setCredentials] = React.useState<Credentials>();
   const [userInfo, setUserInfo] = React.useState<UserInfo>();
   const [isAuthenticated, setAuthenticated] = React.useState(false);
@@ -22,11 +25,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     _credentials: Credentials,
   ): Promise<void> => {
     try {
-      await saveCredentials(_credentials);
+      await onSaveCredentials(_credentials);
     } catch (error) {
       throw new Error('Error saved credentials');
     }
-  }, [saveCredentials]);
+  }, [onSaveCredentials]);
 
 
   /**
@@ -35,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
    */
   const onGetStoreToken = async (): Promise<Credentials | null> => {
     try {
-      const token = await getCredentials();
+      const token = await onGetCredentials();
       return token;
     } catch (error) {
       console.error('Error get store', JSON.stringify(error));
@@ -48,7 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
    */
   const removeToken = React.useCallback(async (): Promise<void> => {
     try {
-      await removeCredentials();
+      await onRemoveCredentials();
     } catch (error) {
       console.error('Error delete store token', JSON.stringify(error));
       throw new Error('Error delete store token');
@@ -57,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     setCredentials(undefined);
     setAuthenticated(false);
     setLoading(false);
-  }, [removeCredentials]);
+  }, [onRemoveCredentials]);
 
 
   const login = React.useCallback(async () => {
@@ -77,20 +80,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     }
 
     const authorizeUserInfo = jwt_decode(authorizeResponse.idToken) as UserInfo;
-    const token =  authorizeResponse.idToken;
-
-    const email = authorizeUserInfo?.email;
-    try {
-      await fetchUser(eichBaseEndpoint, token);
-    } catch (error) {
-      console.log('eichbase error', JSON.stringify(error));
-      await createUser({ 
-        token, 
-        email, 
-        endpoint: eichBaseEndpoint, 
-        authProfileId: eichBaseAuthProfileId 
-      });
-    }
 
     await onSaveToken(authorizeResponse);
    
@@ -98,7 +87,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     setUserInfo(authorizeUserInfo);
     setAuthenticated(true);
     setLoading(false);
-  }, [eichBaseEndpoint, auth0, eichBaseAuthProfileId, onSaveToken]);
+  }, [auth0, onSaveToken]);
 
 
 
@@ -114,12 +103,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   }, [auth0, removeToken]);
 
 
-  const authenticateCheck = async (): Promise<void> => {
+  const auth = async (): Promise<UserInfo | null> => {
     const storedCredentials = await onGetStoreToken();
 
     if (!storedCredentials) {
       setLoading(false);
-      return;
+      return null;
     }
 
     let request;
@@ -130,19 +119,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     } catch (error) {
       console.warn('Authenticate error', JSON.stringify(error));
       removeToken();
-      return;
+      return null;
     }
 
     setCredentials(storedCredentials);
     setUserInfo(request);
     setAuthenticated(true);
     setLoading(false);
+    return request;
   };
-
-  React.useEffect(() => {
-    authenticateCheck();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <AuthContext.Provider
@@ -153,6 +138,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
         isLoading,
         login,
         logout,
+        auth
       }}>
       {children}
     </AuthContext.Provider>
