@@ -19,6 +19,8 @@ $ npm i @cobuildlab/react-native-auth0
 ```
 ## Usage
 
+#### Auth0 Client Setup:
+
 Create a new client instance using Auth0Native:
 
 ```tsx
@@ -67,3 +69,66 @@ export const App = () => (
   </AuthProvider>
 );
 ```
+
+#### Hook usage
+
+Login View
+
+```tsx
+import { View, Button } from 'react-native;
+import { useAuth } from '@cobuildlab/react-native-auth0';
+
+export const LoginView = () => {
+  const { authorize } = useAuth();
+
+  return (
+    <View>
+      <Button onPress={authorize} title="Sign in">
+    </View>
+  )
+}
+
+```
+
+Logout View
+
+```tsx
+import { View, Button } from 'react-native;
+import { useAuth } from '@cobuildlab/react-native-auth0';
+
+export const LogOutView = () => {
+  const { clearSession } = useAuth();
+
+  return (
+    <View>
+      <Button onPress={clearSession} title="Sign in">
+    </View>
+  )
+}
+```
+
+App Component
+
+```tsx
+import { useAuth } from '@cobuildlab/react-native-auth0';
+import { LoginView } from './LoginView';
+import { LogOutView } from './LogOutView';
+import { MainView,  Loading } from './others'
+
+
+export function App() {
+  const { isLoading, isAuthenticated, clearSession } = useAuth();
+
+  if(isLoading){
+    return <Loading />
+  }
+
+  if(!isAuthenticated){
+    return < LoginView />
+  }
+
+  return <MainView />
+}
+
+```
+
