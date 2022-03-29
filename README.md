@@ -1,11 +1,3 @@
-# TODO 
-  
-  - Documentation
-  - Refresh Token
-  - Auth0 Params
-  - Clean Code
-  - Test Code
-
 # React Native Auth0
 
 A wrapper on auth0's react native library with common case features already implemented.
@@ -70,9 +62,9 @@ export const App = () => (
 );
 ```
 
-#### Hook usage
+#### Hook usage:
 
-Login View
+Login View:
 
 ```tsx
 import { View, Button } from 'react-native;
@@ -90,7 +82,7 @@ export const LoginView = () => {
 
 ```
 
-Logout View
+Logout View:
 
 ```tsx
 import { View, Button } from 'react-native;
@@ -107,7 +99,7 @@ export const LogOutView = () => {
 }
 ```
 
-App Component
+App Component:
 
 ```tsx
 import { useAuth } from '@cobuildlab/react-native-auth0';
@@ -132,3 +124,7 @@ export function App() {
 
 ```
 
+### TODO 
+  
+  - Documentation
+  - Test Code
