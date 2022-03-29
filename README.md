@@ -56,7 +56,7 @@ const AUTH0_SCOPE = 'offline_access email openid profile';
 export const App = () => (
   <AuthProvider 
     client={auth0NativeClient} 
-    scope={AUTH0_SCOPE}>
+    scope={client}>
     <App />
   </AuthProvider>
 );
