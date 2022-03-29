@@ -30,7 +30,8 @@ const AUTH0_OPTIONS = {
   domain: AUTH_CLIENT_DOMAIN,
 }
 
-// You can handle the credentials obtained in auth0 and store them in the async store or another store of your choice
+// You can handle the credentials obtained in auth0 
+// and store them in the async store or another store of your choice
 const CREDENTIALS_HANDLER = {
   save: async (credentials): Promise<void> => {
     const value = JSON.stringify(credentials);
@@ -49,3 +50,20 @@ const CREDENTIALS_HANDLER = {
 export const client = new Auth0Native(AUTH0_OPTIONS, CREDENTIALS_HANDLER);
 ```
 
+Then import the client and pass through props to the provider:
+
+```tsx
+import { AuthProvider } from '@cobuildlab/react-native-auth0';
+import { client } from './config';
+
+
+const AUTH0_SCOPE = 'offline_access email openid profile';
+
+export const App = () => (
+  <AuthProvider 
+    client={auth0NativeClient} 
+    scope={AUTH0_SCOPE}>
+    <App />
+  </AuthProvider>
+);
+```
