@@ -1,52 +1,28 @@
-import { User } from './types';
-import { USER_QUERY, CREATE_USER_QUERY } from './constant';
- 
+import { ErrorCallbackType } from './types';
 
-export const fetchUser = async (endpoint: string, token: string): Promise<User | null> => {
-  const request = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ query: USER_QUERY }),
-  });
-
-  const response = await request.json();
-
-  if(response?.errors){
-    throw new Error(JSON.stringify(response?.errors));
-  }
-
-  return response as User;
-};
-
-type createUserParams = {
-  endpoint: string;
-  token: string;
-  email: string;
-  authProfileId: string;
+/**.
+ * Get the current timestamp in seconds
+ *
+ * @returns {number} the timestamp
+ */
+export function getTimestamp(): number {
+  return Math.round(new Date().getTime() / 1000);
 }
 
-export const createUser = async (params: createUserParams): Promise<User> => {
-  const { endpoint, token, email, authProfileId } = params;
+export class ErrorPublisher {
+  private subscribers: Set<ErrorCallbackType> = new Set();
 
-  const request = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ 
-      query: CREATE_USER_QUERY(email, authProfileId) 
-    }),
-  });
+  subscribe(callback: ErrorCallbackType): () => void {
+    this.subscribers.add(callback);
 
-  const response = await request.json();
-
-  if(response?.errors){
-    throw new Error(JSON.stringify(response?.errors));
+    return () => {
+      this.subscribers.delete(callback);
+    };
   }
 
-  return response as User;
-};
+  notify(error: Error): void {
+    this.subscribers.forEach((item) => {
+      item(error);
+    });
+  }
+}

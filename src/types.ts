@@ -1,28 +1,32 @@
-import Auth0, { UserInfo, Credentials } from 'react-native-auth0';
+import {
+  AuthorizeOptions,
+  Credentials as Auth0Credentials,
+} from 'react-native-auth0';
 
-export interface User {
-  id: string;
-  email: string;
+export interface Credentials extends Auth0Credentials {
+  issuedAt: number;
 }
 
-export type UseAuthType = {
-  credentials?: Credentials;
-  userInfo?: UserInfo;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: () => void;
-  logout: () => void;
+export type CredentialsHandlersInput = {
+  save: (data: Credentials) => void | Promise<void>;
+  clear: () => void | Promise<void>;
+  get: () => (Credentials | null) | Promise<Credentials | null>;
 };
 
-export type AuthProviderConfig = {
-  auth0: Auth0;
-  eichBaseEndpoint: string;
-  eichBaseAuthProfileId: string;
-  getCredentials: () => Promise< Credentials | null>;
-  removeCredentials: () => Promise<void>;
-  saveCredentials: (credentials: Credentials) => Promise<void>;
+export interface AuthClientContextType {
+  authorize: (args: {
+    scope?: string;
+    options?: AuthorizeOptions;
+  }) => Promise<void>;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  clearSession: () => Promise<void>;
 }
 
-export type AuthProviderProps = {
-  config: AuthProviderConfig;
+export type ErrorCallbackType = (error: Error) => void;
+
+export enum ErrorCases {
+  AUTHORIZATION = 'AUTHORIZATION',
+  CLEAR_SESSION = 'CLEAR_SESSION',
+  REFRESH_TOKEN = 'REFRESH_TOKEN',
 }

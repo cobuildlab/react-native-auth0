@@ -1,12 +1,19 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-import * as React from 'react';
-import { UseAuthType } from './types';
+import { createContext, useContext } from 'react';
+import { AuthClientContextType } from './types';
 
-export const AuthContext = React.createContext<UseAuthType>({
+/**
+ * @ignore
+ */
+const stub = (): never => {
+  throw new Error('You forgot to wrap your component in <Auth0Provider>.');
+};
+
+export const AuthClientContext = createContext<AuthClientContextType>({
   isAuthenticated: false,
-  isLoading: false,
-  login: () => {},
-  logout: () => {},
+  isLoading: true,
+  clearSession: stub,
+  authorize: stub,
 });
 
-
+export const useAuth = (): AuthClientContextType =>
+  useContext(AuthClientContext);
