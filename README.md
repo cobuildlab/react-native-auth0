@@ -109,7 +109,7 @@ import { MainView,  Loading } from './others'
 
 
 export function App() {
-  const { isLoading, isAuthenticated, clearSession } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
 
   if(isLoading){
     return <Loading />

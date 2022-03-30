@@ -1,9 +1,17 @@
 {
   "name": "@cobuildlab/react-native-auth0",
   "version": "0.2.1",
-  "description": "Todo",
+  "description": "A wrapper on auth0's react native library with common case features already implemented.",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cobuildlab/react-native-auth0.git",
+    "baseUrl": "https://github.com/cobuildlab/react-native-auth0"
+  },
+  "keywords": [
+    "react-native"
+  ],
   "scripts": {
     "test": "jest --collect-coverage",
     "build": "tsc",
@@ -12,9 +20,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "eslint -c .eslintrc.js src/**/*.ts"
   },
-  "homepage": "",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/cobuildlab/react-native-auth0/issues"
   },
   "author": "Carlos Hurtado",
   "license": "GPL-3.0",
