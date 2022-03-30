@@ -55,8 +55,8 @@ const AUTH0_SCOPE = 'offline_access email openid profile';
 
 export const App = () => (
   <AuthProvider 
-    client={auth0NativeClient} 
-    scope={client}>
+    client={client} 
+    scope={AUTH0_SCOPE}>
     <App />
   </AuthProvider>
 );
@@ -67,7 +67,7 @@ export const App = () => (
 Login View:
 
 ```tsx
-import { View, Button } from 'react-native;
+import { View, Button } from 'react-native';
 import { useAuth } from '@cobuildlab/react-native-auth0';
 
 export const LoginView = () => {
@@ -75,7 +75,7 @@ export const LoginView = () => {
 
   return (
     <View>
-      <Button onPress={authorize} title="Sign in">
+      <Button onPress={authorize} title="login">
     </View>
   )
 }
@@ -93,7 +93,7 @@ export const LogOutView = () => {
 
   return (
     <View>
-      <Button onPress={clearSession} title="Sign in">
+      <Button onPress={clearSession} title="Logout">
     </View>
   )
 }
