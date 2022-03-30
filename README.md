@@ -1,61 +1,130 @@
-# TODO 
-  
-  - Documentation
-  - Refresh Token
-  - Auth0 Params
-  - Clean Code
-  - Test Code
+# React Native Auth0
 
+A wrapper on auth0's react native library with common case features already implemented.
 
-Basic use: 
+## Installation
+
+1. Run on your terminal the following command:
+
+```sh
+$ npm i @cobuildlab/react-native-auth0
+```
+## Usage
+
+#### Auth0 Client Setup:
+
+Create a new client instance using Auth0Native:
 
 ```tsx
-import React from 'react';
-import { View, Button, Text } from 'react-native';
-import { useAuth, AuthProviderConfig, AuthProvider } from '@cobuildlab/react-native-auth0';
-import { Credentials } from 'react-native-auth0';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Auth0Native } from '@cobuildlab/react-native-auth0';
 
-import { auth0 } from './src/shared/auth0/client';
+// AUTH0 options
+const AUTH0_OPTIONS = {
+  clientId: AUTH_CLIENT_ID,
+  domain: AUTH_CLIENT_DOMAIN,
+}
 
-const App: React.FC = () => {
-  const { login, logout, isLoading, isAuthenticated } = useAuth();
-  console.log('---- isAuthenticated --- ', isAuthenticated);
-  console.log('---- isLoading --- ', isLoading);
-
-  return (
-    <View>
-      <Text>{isAuthenticated ? 'Im On' : 'Im Off'}</Text>
-      <Button onPress={login} title="login" />
-      <Button onPress={logout} title="logout" />
-    </View>
-  );
-};
-
-const Conifg: AuthProviderConfig = {
-  auth0,
-  eichBaseToken: '8base-token',
-  eichBaseAuthProfileId: 'my-profile-id',
-  eichBaseEndpoint: '8base-environemnt-branch',
-  removeCredentials: async () => {
-    await AsyncStorage.removeItem('credentials_store');
-  },
-  saveCredentials: async (credentials) => {
+// You can handle the credentials obtained in auth0 
+// and store them in the async store or another store of your choice
+const CREDENTIALS_HANDLER = {
+  save: async (credentials): Promise<void> => {
     const value = JSON.stringify(credentials);
     await AsyncStorage.setItem('credentials_store', value);
   },
-  getCredentials: async (): Promise<Credentials | null> => {
+  get: async () => {
     const value = await AsyncStorage.getItem('credentials_store');
     return value != null ? JSON.parse(value) : null;
   },
-};
+  clear: async () => {
+    await AsyncStorage.removeItem('credentials_store');
+    apolloClient.resetStore();
+  },
+}
 
-export const App = () => {
-  return (
-    <AuthProvider config={Conifg}>
-      <App />
-    </AuthProvider>
-  );
-};
+export const client = new Auth0Native(AUTH0_OPTIONS, CREDENTIALS_HANDLER);
 ```
 
+Then import the client and pass through props to the provider:
+
+```tsx
+import { AuthProvider } from '@cobuildlab/react-native-auth0';
+import { client } from './config';
+
+
+const AUTH0_SCOPE = 'offline_access email openid profile';
+
+export const App = () => (
+  <AuthProvider 
+    client={auth0NativeClient} 
+    scope={client}>
+    <App />
+  </AuthProvider>
+);
+```
+
+#### Hook usage:
+
+Login View:
+
+```tsx
+import { View, Button } from 'react-native;
+import { useAuth } from '@cobuildlab/react-native-auth0';
+
+export const LoginView = () => {
+  const { authorize } = useAuth();
+
+  return (
+    <View>
+      <Button onPress={authorize} title="Sign in">
+    </View>
+  )
+}
+
+```
+
+Logout View:
+
+```tsx
+import { View, Button } from 'react-native;
+import { useAuth } from '@cobuildlab/react-native-auth0';
+
+export const LogOutView = () => {
+  const { clearSession } = useAuth();
+
+  return (
+    <View>
+      <Button onPress={clearSession} title="Sign in">
+    </View>
+  )
+}
+```
+
+App Component:
+
+```tsx
+import { useAuth } from '@cobuildlab/react-native-auth0';
+import { LoginView } from './LoginView';
+import { LogOutView } from './LogOutView';
+import { MainView,  Loading } from './others'
+
+
+export function App() {
+  const { isLoading, isAuthenticated, clearSession } = useAuth();
+
+  if(isLoading){
+    return <Loading />
+  }
+
+  if(!isAuthenticated){
+    return < LoginView />
+  }
+
+  return <MainView />
+}
+
+```
+
+### TODO 
+  
+  - Documentation
+  - Test Code
