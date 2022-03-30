@@ -85,7 +85,7 @@ export const LoginView = () => {
 Logout View:
 
 ```tsx
-import { View, Button } from 'react-native;
+import { View, Button } from 'react-native';
 import { useAuth } from '@cobuildlab/react-native-auth0';
 
 export const LogOutView = () => {
