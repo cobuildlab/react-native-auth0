@@ -18,6 +18,7 @@ Create a new client instance using Auth0Native:
 
 ```ts
 import { Auth0Native } from '@cobuildlab/react-native-auth0';
+import jwtDecode from 'jwt-decode';
 
 // AUTH0 options
 const AUTH0_OPTIONS = {
