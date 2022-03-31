@@ -4,13 +4,14 @@ import {
 } from 'react-native-auth0';
 
 export interface Credentials extends Auth0Credentials {
-  issuedAt: number;
+  issuedAt?: number;
 }
 
 export type CredentialsHandlersInput = {
   save: (data: Credentials) => void | Promise<void>;
   clear: () => void | Promise<void>;
   get: () => (Credentials | null) | Promise<Credentials | null>;
+  validateToken: (data: Credentials) => boolean;
 };
 
 export interface AuthClientContextType {
@@ -29,4 +30,5 @@ export enum ErrorCases {
   AUTHORIZATION = 'AUTHORIZATION',
   CLEAR_SESSION = 'CLEAR_SESSION',
   REFRESH_TOKEN = 'REFRESH_TOKEN',
+  SAVE_CREDENTIALS = 'SAVE_CREDENTIALS',
 }

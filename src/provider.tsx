@@ -16,19 +16,13 @@ export const AuthProvider: React.FC<{
   });
 
   useEffect(() => {
-    (async () => {
-      try {
-        const isAuth = await client.isAuthenticated();
-
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          isAuthenticated: isAuth,
-        }));
-      } catch (error) {
-        console.log(error);
-      }
-    })();
+    client.isAuthenticated().then((isAuth) => {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        isAuthenticated: isAuth,
+      }));
+    });
   }, [client]);
 
   const authorize: AuthClientContextType['authorize'] = async ({
@@ -36,22 +30,22 @@ export const AuthProvider: React.FC<{
     options,
   }) => {
     setState((prev) => ({ ...prev, isLoading: true }));
-
-    try {
-      await client.authorize(newScope || scope, options);
-
-      setState((prev) => ({
-        ...prev,
-        isLoading: false,
-        isAuthenticated: true,
-      }));
-    } catch {
-      setState((prev) => ({
-        ...prev,
-        isLoading: false,
-        isAuthenticated: false,
-      }));
-    }
+    client
+      .authorize(newScope || scope, options)
+      .then(() => {
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          isAuthenticated: true,
+        }));
+      })
+      .catch(() => {
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          isAuthenticated: false,
+        }));
+      });
   };
 
   const clearSession: AuthClientContextType['clearSession'] = async () => {
@@ -59,18 +53,13 @@ export const AuthProvider: React.FC<{
       ...prev,
       isLoading: true,
     }));
-    console.log('logging out...');
-
-    try {
-      await client.clearSession();
-    } catch (error) {
-      console.log(error);
-    }
-    setState((prev) => ({
-      ...prev,
-      isLoading: false,
-      isAuthenticated: false,
-    }));
+    client.clearSession().then(() => {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        isAuthenticated: false,
+      }));
+    });
   };
 
   return (

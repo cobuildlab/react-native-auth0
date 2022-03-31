@@ -4,21 +4,21 @@ import Auth0, {
   Options,
 } from 'react-native-auth0';
 import { Credentials, CredentialsHandlersInput, ErrorCases } from './types';
-import { ErrorPublisher, getTimestamp } from './utils';
+import { ErrorPublisher } from './utils';
 
 export class Auth0Native extends Auth0 {
   private credentials: Credentials | null = null;
 
   private saveCredentials: CredentialsHandlersInput['save'];
-
   private getCredentials: CredentialsHandlersInput['get'];
-
   private clearCredentials: CredentialsHandlersInput['clear'];
+  private validateToken: CredentialsHandlersInput['validateToken'];
 
   private errors: Record<ErrorCases, ErrorPublisher> = {
     AUTHORIZATION: new ErrorPublisher(),
     CLEAR_SESSION: new ErrorPublisher(),
     REFRESH_TOKEN: new ErrorPublisher(),
+    SAVE_CREDENTIALS: new ErrorPublisher(),
   };
 
   constructor(options: Options, credentialsHandlers: CredentialsHandlersInput) {
@@ -26,12 +26,16 @@ export class Auth0Native extends Auth0 {
     this.saveCredentials = credentialsHandlers.save;
     this.getCredentials = credentialsHandlers.get;
     this.clearCredentials = credentialsHandlers.clear;
+    this.validateToken = credentialsHandlers.validateToken;
   }
 
   async handleCredentials(data: Auth0Credentials): Promise<Credentials> {
-    const credentials: Credentials = { ...data, issuedAt: getTimestamp() };
-
-    await this.saveCredentials(credentials);
+    const credentials: Credentials = { ...data };
+    try {
+      await this.saveCredentials(credentials);
+    } catch (error) {
+      this.errors.SAVE_CREDENTIALS.notify(error as Error);
+    }
 
     this.credentials = credentials;
 
@@ -63,7 +67,8 @@ export class Auth0Native extends Auth0 {
       return this.handleCredentials(result);
     } catch (error) {
       this.errors.AUTHORIZATION.notify(error as Error);
-      return;
+
+      throw error;
     }
   }
 
@@ -86,11 +91,7 @@ export class Auth0Native extends Auth0 {
       return false;
     }
 
-    const tokenTimestamp = credentials.expiresIn + credentials.issuedAt;
-
-    const validToken = tokenTimestamp > getTimestamp();
-
-    if (validToken) {
+    if (this.validateToken(credentials)) {
       this.credentials = credentials;
       return true;
     }
