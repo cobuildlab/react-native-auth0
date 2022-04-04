@@ -1,19 +1,25 @@
 import Auth0, {
   AuthorizeOptions,
   Credentials as Auth0Credentials,
-  Options,
 } from 'react-native-auth0';
-import { Credentials, CredentialsHandlersInput, ErrorCases } from './types';
-import { ErrorPublisher } from './utils';
+import {
+  Credentials,
+  CredentialsHandlersInput,
+  ErrorCases,
+  Options,
+  tokenToValidateType,
+} from './types';
+import { ErrorPublisher, validateToken } from './utils';
 
 export class Auth0Native extends Auth0 {
   private credentials: Credentials | null = null;
+  private audience: string;
 
   private saveCredentials: CredentialsHandlersInput['save'];
   private getCredentials: CredentialsHandlersInput['get'];
   private clearCredentials: CredentialsHandlersInput['clear'];
-  private validateToken: CredentialsHandlersInput['validateToken'];
-
+  private validateToken?: CredentialsHandlersInput['validateToken'];
+  private tokenToValidate?: tokenToValidateType;
   private errors: Record<ErrorCases, ErrorPublisher> = {
     AUTHORIZATION: new ErrorPublisher(),
     CLEAR_SESSION: new ErrorPublisher(),
@@ -21,12 +27,22 @@ export class Auth0Native extends Auth0 {
     SAVE_CREDENTIALS: new ErrorPublisher(),
   };
 
+  /**
+   * Create a client to used to authenticate with auth0 platform and manage that auth state.
+   *
+   * @param {Options} options - Options.
+   * @param {CredentialsHandlersInput} credentialsHandlers - Options to handle the credentials and token validations.
+   */
   constructor(options: Options, credentialsHandlers: CredentialsHandlersInput) {
     super(options);
     this.saveCredentials = credentialsHandlers.save;
     this.getCredentials = credentialsHandlers.get;
     this.clearCredentials = credentialsHandlers.clear;
     this.validateToken = credentialsHandlers.validateToken;
+    this.tokenToValidate = credentialsHandlers.tokenToValidate;
+
+    // set a default audience if the options is undefined
+    this.audience = options.audience || `https://${options.domain}/api/v2/`;
   }
 
   async handleCredentials(data: Auth0Credentials): Promise<Credentials> {
@@ -49,8 +65,8 @@ export class Auth0Native extends Auth0 {
   /**
    *
    * @param {string} scope -  Scopes requested for the issued tokens. E.g. `openid profile`.
-   * @param {object} options - Options to pass to the auth endpoint.
-   * @returns {object} The auth0 credentials.
+   * @param {AuthorizeOptions} options - Options to pass to the auth endpoint.
+   * @returns {Promise<Credentials | undefined>} The auth0 credentials.
    */
   async authorize(
     scope: string,
@@ -60,6 +76,7 @@ export class Auth0Native extends Auth0 {
       const result = await this.webAuth.authorize(
         {
           scope,
+          audience: this.audience,
         },
         options,
       );
@@ -90,8 +107,20 @@ export class Auth0Native extends Auth0 {
     if (!credentials) {
       return false;
     }
+    let valid = false;
 
-    if (this.validateToken(credentials)) {
+    if (this.validateToken && this.validateToken(credentials)) {
+      valid = true;
+    }
+
+    if (
+      this.tokenToValidate &&
+      validateToken(credentials[this.tokenToValidate])
+    ) {
+      valid = true;
+    }
+
+    if (valid) {
       this.credentials = credentials;
       return true;
     }

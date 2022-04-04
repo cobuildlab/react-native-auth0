@@ -41,6 +41,9 @@ const CREDENTIALS_HANDLER = {
     await AsyncStorage.removeItem('credentials_store');
     apolloClient.resetStore();
   },
+  // You can specify a what token the library will validate
+  tokenToValidate: 'accessToken',
+  // or pass a function that validate it
   validateToken: (credentials) => {
     const { exp } = jwtDecode(credentials.idToken) as { exp: number };
 
