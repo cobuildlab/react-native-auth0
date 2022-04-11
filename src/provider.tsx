@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Auth0Native } from './client';
 import { AuthClientContext } from './context';
 import { AuthClientContextType } from './types';
@@ -7,7 +7,7 @@ export const AuthProvider: React.FC<{
   client: Auth0Native;
   scope: string;
 }> = ({ children, client, scope }) => {
-  const [state, setState] = useState<{
+  const [state, setState] = React.useState<{
     isLoading: boolean;
     isAuthenticated: boolean;
   }>({
@@ -15,7 +15,7 @@ export const AuthProvider: React.FC<{
     isLoading: true,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     client.isAuthenticated().then((isAuth) => {
       setState((prev) => ({
         ...prev,

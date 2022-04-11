@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import * as React from 'react';
 import { AuthClientContextType } from './types';
 
 /**
@@ -8,7 +8,7 @@ const stub = (): never => {
   throw new Error('You forgot to wrap your component in <Auth0Provider>.');
 };
 
-export const AuthClientContext = createContext<AuthClientContextType>({
+export const AuthClientContext = React.createContext<AuthClientContextType>({
   isAuthenticated: false,
   isLoading: true,
   clearSession: stub,
@@ -16,4 +16,4 @@ export const AuthClientContext = createContext<AuthClientContextType>({
 });
 
 export const useAuth = (): AuthClientContextType =>
-  useContext(AuthClientContext);
+  React.useContext(AuthClientContext);
