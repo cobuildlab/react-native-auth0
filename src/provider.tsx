@@ -25,10 +25,9 @@ export const AuthProvider: React.FC<{
     });
   }, [client]);
 
-  const authorize: AuthClientContextType['authorize'] = async ({
-    scope: newScope,
-    options,
-  }) => {
+  const authorize: AuthClientContextType['authorize'] = async (params) => {
+    const { scope: newScope, options } = params || {};
+
     setState((prev) => ({ ...prev, isLoading: true }));
     client
       .authorize(newScope || scope, options)

@@ -33,10 +33,14 @@ export type CredentialsHandlersInput = CredentialsHandlersInputBase &
   );
 
 export interface AuthClientContextType {
-  authorize: (args: {
-    scope?: string;
-    options?: AuthorizeOptions;
-  }) => Promise<void>;
+  authorize: (
+    args:
+      | {
+          scope?: string;
+          options?: AuthorizeOptions;
+        }
+      | undefined,
+  ) => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
   clearSession: () => Promise<void>;
