@@ -1,6 +1,6 @@
 {
   "name": "@cobuildlab/react-native-auth0",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Todo",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
