@@ -62,6 +62,16 @@ export class Auth0Native extends Auth0 {
     return this.credentials;
   }
 
+  async retrieveCredentials(): Promise<Credentials> {
+    const isAuthenticated = await this.isAuthenticated();
+
+    if (!isAuthenticated || !this.credentials) {
+      throw new Error('User is not authenticated');
+    }
+
+    return this.credentials;
+  }
+
   /**
    *
    * @param {string} scope -  Scopes requested for the issued tokens. E.g. `openid profile`.

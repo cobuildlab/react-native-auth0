@@ -44,6 +44,7 @@ export interface AuthClientContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   clearSession: () => Promise<void>;
+  getCredentials: () => Promise<Credentials>;
 }
 
 export type ErrorCallbackType = (error: Error) => void;
