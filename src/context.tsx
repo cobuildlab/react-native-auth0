@@ -13,6 +13,7 @@ export const AuthClientContext = React.createContext<AuthClientContextType>({
   isLoading: true,
   clearSession: stub,
   authorize: stub,
+  getCredentials: stub,
 });
 
 export const useAuth = (): AuthClientContextType =>
