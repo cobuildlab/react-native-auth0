@@ -47,6 +47,10 @@ export const AuthProvider: React.FC<{
       });
   };
 
+  const getCredentials: AuthClientContextType['getCredentials'] = async () => {
+    return client.retrieveCredentials();
+  };
+
   const clearSession: AuthClientContextType['clearSession'] = async () => {
     setState((prev) => ({
       ...prev,
@@ -62,7 +66,8 @@ export const AuthProvider: React.FC<{
   };
 
   return (
-    <AuthClientContext.Provider value={{ ...state, authorize, clearSession }}>
+    <AuthClientContext.Provider
+      value={{ ...state, authorize, clearSession, getCredentials }}>
       {children}
     </AuthClientContext.Provider>
   );
