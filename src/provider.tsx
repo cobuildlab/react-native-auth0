@@ -6,6 +6,7 @@ import { AuthClientContextType } from './types';
 export const AuthProvider: React.FC<{
   client: Auth0Native;
   scope: string;
+  children: React.ReactNode;
 }> = ({ children, client, scope }) => {
   const [state, setState] = React.useState<{
     isLoading: boolean;
